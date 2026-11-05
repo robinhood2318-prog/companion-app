@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">FocusTask Companion</string>
+    <string name="start_study_session">Start Study Session</string>
+    <string name="end_study_session">End Study Session</string>
+    <string name="add_task">Add Task</string>
+    <string name="dismiss_alarm">Dismiss</string>
+    <string name="snooze_alarm">Snooze</string>
+</resources>
