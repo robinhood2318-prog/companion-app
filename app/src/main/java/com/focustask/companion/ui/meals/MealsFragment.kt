@@ -22,7 +22,9 @@ import com.focustask.companion.data.model.MealEntity
 import com.focustask.companion.databinding.DialogMealEditBinding
 import com.focustask.companion.databinding.FragmentMealsBinding
 import com.focustask.companion.meals.MealScheduler
+import com.focustask.companion.ui.SubScreenActivity
 import com.focustask.companion.ui.dp
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.ui.formatTime
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -59,6 +61,11 @@ class MealsFragment : Fragment() {
             }
         }
         buildDayStrip()
+        if (requireActivity() is SubScreenActivity) {
+            binding.btnBack.visibility = View.VISIBLE
+            binding.btnBack.setOnClickListener { requireActivity().finish() }
+        }
+        VoiceSettings.bindToggle(binding.btnVoice, VoiceSettings.Section.MEALS)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 db.mealDao().getAllMeals().collect {

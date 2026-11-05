@@ -84,6 +84,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:checked="true"
-            android:text="Read the label aloud" />
+            android:text="Read the label aloud (if voice is on for Alarms)" />
     </LinearLayout>
 </ScrollView>

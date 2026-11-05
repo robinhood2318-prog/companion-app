@@ -46,6 +46,18 @@
                         android:text="FocusTask" />
 
                     <ImageButton
+                        android:id="@+id/btn_voice"
+                        style="@style/HeaderIconButton"
+                        android:contentDescription="Voice"
+                        android:src="@drawable/ic_volume" />
+
+                    <ImageButton
+                        android:id="@+id/btn_reminder_settings"
+                        style="@style/HeaderIconButton"
+                        android:contentDescription="Screen reminder settings"
+                        android:src="@drawable/ic_settings" />
+
+                    <ImageButton
                         android:id="@+id/btn_sounds"
                         android:layout_width="44dp"
                         android:layout_height="44dp"
@@ -240,7 +252,7 @@
                 <TextView
                     style="@style/CardLabel"
                     android:layout_marginTop="8dp"
-                    android:text="Tip: the timer focuses on your top open task. Long-press a task to delete it." />
+                    android:text="Tip: the timer focuses on your top open task. Tap a task for progress, edit or delete. Tasks with a deadline also appear on the Calendar." />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

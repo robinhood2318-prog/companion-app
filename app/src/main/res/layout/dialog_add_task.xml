@@ -1,53 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingStart="24dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="24dp">
+    android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/et_task_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="What do you need to do?"
-        android:importantForAutofill="no"
-        android:inputType="textCapSentences"
-        android:maxLength="80" />
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp">
 
-    <TextView
-        style="@style/DialogLabel"
-        android:text="Priority" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chip_group_new_priority"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:checkedChip="@+id/chip_new_medium"
-        app:selectionRequired="true"
-        app:singleSelection="true">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_new_high"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/et_task_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="High" />
+            android:hint="e.g. Finish Anatomy syllabus"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences"
+            android:maxLength="80" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_new_medium"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Medium" />
+        <TextView
+            style="@style/DialogLabel"
+            android:text="Priority" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chip_new_low"
-            style="@style/Widget.Material3.Chip.Filter"
-            android:layout_width="wrap_content"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_group_new_priority"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Low" />
-    </com.google.android.material.chip.ChipGroup>
-</LinearLayout>
+            app:checkedChip="@+id/chip_new_medium"
+            app:selectionRequired="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_new_high"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="High" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_new_medium"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medium" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_new_low"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Low" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <TextView
+            style="@style/DialogLabel"
+            android:text="Deadline (optional, shows on the Calendar)" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_due"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="No deadline" />
+
+            <Button
+                android:id="@+id/btn_clear_due"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clear" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/DialogLabel"
+            android:text="Track progress (optional)" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/et_parts"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="How many, e.g. 12"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="4" />
+
+            <EditText
+                android:id="@+id/et_parts_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:hint="chapters / topics"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:maxLength="20" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

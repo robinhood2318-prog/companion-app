@@ -25,6 +25,8 @@ import com.focustask.companion.databinding.DialogAddTaskBinding
 import com.focustask.companion.databinding.FragmentFocusBinding
 import com.focustask.companion.service.FocusSession
 import com.focustask.companion.ui.MainActivity
+import com.focustask.companion.ui.TaskUi
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.ui.dp
 import com.focustask.companion.ui.focusOrder
 import com.focustask.companion.ui.priorityColor
@@ -63,7 +65,11 @@ class FocusFragment : Fragment() {
         binding.timerFrame.setOnClickListener { chooseDuration() }
         binding.btnAllowedApps.setOnClickListener { showAllowedAppsDialog() }
         binding.btnSounds.setOnClickListener { startActivity(Intent(requireContext(), SoundsActivity::class.java)) }
-        binding.fabAddTask.setOnClickListener { showAddTaskDialog() }
+        binding.fabAddTask.setOnClickListener { TaskUi.showEditor(this, null) }
+        binding.btnReminderSettings.setOnClickListener {
+            startActivity(Intent(requireContext(), FocusSettingsActivity::class.java))
+        }
+        VoiceSettings.bindToggle(binding.btnVoice, VoiceSettings.Section.FOCUS)
 
         binding.chipGroupPriority.setOnCheckedStateChangeListener { _, ids ->
             filter = when (ids.firstOrNull()) {
@@ -92,6 +98,11 @@ class FocusFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        VoiceSettings.bindToggle(binding.btnVoice, VoiceSettings.Section.FOCUS)
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -180,73 +191,12 @@ class FocusFragment : Fragment() {
             return
         }
         for (task in tasks) {
-            val row = LinearLayout(context).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                setPadding(0, context.dp(2), 0, context.dp(2))
-            }
-            val check = CheckBox(context).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                text = task.title
-                isChecked = task.isCompleted
-                setTextColor(ContextCompat.getColor(context, if (task.isCompleted) R.color.text_secondary else R.color.text_primary))
-                paintFlags = if (task.isCompleted) paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                else paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                setOnCheckedChangeListener { _, checked ->
-                    viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                        db.taskDao().updateTask(task.copy(isCompleted = checked))
-                    }
-                }
-                setOnLongClickListener {
-                    confirmDelete(task)
-                    true
-                }
-            }
-            val dot = View(context).apply {
-                layoutParams = LinearLayout.LayoutParams(context.dp(10), context.dp(10)).apply {
-                    marginStart = context.dp(8)
-                    marginEnd = context.dp(8)
-                }
-                background = ContextCompat.getDrawable(context, R.drawable.bg_dot)
-                backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, priorityColor(task.priority)))
-                contentDescription = "${task.priority} priority"
-            }
-            row.addView(check)
-            row.addView(dot)
-            list.addView(row)
+            list.addView(TaskUi.buildRow(
+                context, task,
+                onChecked = { done -> TaskUi.setCompleted(this, task, done) },
+                onClick = { TaskUi.showActions(this, task) }
+            ))
         }
-    }
-
-    private fun showAddTaskDialog() {
-        val dialogBinding = DialogAddTaskBinding.inflate(layoutInflater)
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("New task")
-            .setView(dialogBinding.root)
-            .setPositiveButton("Add") { _, _ ->
-                val title = dialogBinding.etTaskTitle.text.toString().trim()
-                if (title.isEmpty()) return@setPositiveButton
-                val priority = when (dialogBinding.chipGroupNewPriority.checkedChipId) {
-                    R.id.chip_new_high -> "high"
-                    R.id.chip_new_low -> "low"
-                    else -> "medium"
-                }
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    db.taskDao().insertTask(TaskEntity(title = title, priority = priority))
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    private fun confirmDelete(task: TaskEntity) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete task?")
-            .setMessage(task.title)
-            .setPositiveButton("Delete") { _, _ ->
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) { db.taskDao().deleteTask(task) }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 
     // ---------- Allowed apps ----------

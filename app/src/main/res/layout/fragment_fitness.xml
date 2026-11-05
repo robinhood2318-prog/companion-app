@@ -20,9 +20,32 @@
             android:paddingEnd="20dp"
             android:paddingBottom="56dp">
 
-            <TextView
-                style="@style/HeaderTitle"
-                android:text="Walk &amp; Fitness" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/btn_back"
+                    style="@style/HeaderIconButton"
+                    android:layout_marginStart="-8dp"
+                    android:contentDescription="Back"
+                    android:src="@drawable/ic_back"
+                    android:visibility="gone" />
+
+                <TextView
+                    style="@style/HeaderTitle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:text="Walk &amp; Fitness" />
+
+                <ImageButton
+                    android:id="@+id/btn_voice"
+                    style="@style/HeaderIconButton"
+                    android:contentDescription="Voice"
+                    android:src="@drawable/ic_volume" />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout

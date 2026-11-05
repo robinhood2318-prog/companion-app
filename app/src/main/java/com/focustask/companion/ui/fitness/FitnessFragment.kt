@@ -14,7 +14,9 @@ import com.focustask.companion.FocusTaskApp
 import com.focustask.companion.data.model.DailyStepEntity
 import com.focustask.companion.databinding.FragmentFitnessBinding
 import com.focustask.companion.service.StepTrackerService
+import com.focustask.companion.ui.SubScreenActivity
 import com.focustask.companion.ui.dp
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.util.hasActivityRecognition
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
@@ -38,6 +40,11 @@ class FitnessFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.cardRing.setOnClickListener { editGoal() }
+        if (requireActivity() is SubScreenActivity) {
+            binding.btnBack.visibility = View.VISIBLE
+            binding.btnBack.setOnClickListener { requireActivity().finish() }
+        }
+        VoiceSettings.bindToggle(binding.btnVoice, VoiceSettings.Section.FITNESS)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {

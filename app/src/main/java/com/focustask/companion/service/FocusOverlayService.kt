@@ -14,6 +14,10 @@ import android.os.Build
 import android.os.IBinder
 import android.telecom.TelecomManager
 import android.util.Log
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -26,7 +30,9 @@ import com.focustask.companion.FocusTaskApp
 import com.focustask.companion.R
 import com.focustask.companion.tts.TtsManager
 import com.focustask.companion.ui.MainActivity
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.util.canDrawOverlay
+import com.focustask.companion.util.formatClock
 import com.focustask.companion.util.hasUsageAccess
 import com.focustask.companion.util.notifyIfAllowed
 import com.focustask.companion.util.startForegroundCompat
@@ -54,9 +60,11 @@ class FocusOverlayService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private var activeTaskName = DEFAULT_TASK
-    private var repopupFrequencyMs = DEFAULT_REPOPUP_MS
     private var endAtMs = 0L
     private var lastDismissedTimeMs = 0L
+    private var snoozedUntilMs = 0L
+    private var blockedSinceMs = 0L
+    private var blockedPkg: String? = null
     private var lastEventQueryMs = 0L
     private var currentForeground: String? = null
     private var alwaysAllowed: Set<String> = emptySet()
@@ -97,7 +105,6 @@ class FocusOverlayService : Service() {
             }
             activeTaskName = prefs.getString(FocusSession.KEY_TASK, DEFAULT_TASK) ?: DEFAULT_TASK
         }
-        repopupFrequencyMs = prefs.getLong(FocusSession.KEY_REPOPUP, DEFAULT_REPOPUP_MS)
 
         try {
             startForegroundCompat(NOTIFICATION_ID, buildForegroundNotification(),
@@ -159,13 +166,21 @@ class FocusOverlayService : Service() {
                 val blocked = pkg !in alwaysAllowed &&
                     !withContext(Dispatchers.IO) { whitelistDao.isAppWhitelisted(pkg) }
 
+                val now = System.currentTimeMillis()
                 if (!blocked) {
+                    blockedSinceMs = 0L
                     hideOverlay() // user moved to an allowed app (e.g. pressed Home)
-                } else if (overlayView == null &&
-                    System.currentTimeMillis() - lastDismissedTimeMs >= repopupFrequencyMs
-                ) {
-                    showOverlay()
+                } else {
+                    if (blockedSinceMs == 0L || pkg != blockedPkg) {
+                        blockedSinceMs = now
+                        blockedPkg = pkg
+                    }
+                    val graceOver = now - blockedSinceMs >= FocusSettings.graceSec(this@FocusOverlayService) * 1000L
+                    val repopupOver = now >= snoozedUntilMs &&
+                        now - lastDismissedTimeMs >= FocusSettings.repopupSec(this@FocusOverlayService) * 1000L
+                    if (overlayView == null && graceOver && repopupOver) showOverlay()
                 }
+                updateOverlayTimeLeft()
             }
         }
     }
@@ -183,7 +198,9 @@ class FocusOverlayService : Service() {
             .setAutoCancel(true)
             .build()
         notifyIfAllowed(DONE_NOTIFICATION_ID, done)
-        ttsManager?.speak("Focus session complete. Great work. Take a short break.")
+        if (VoiceSettings.isEnabled(this, VoiceSettings.Section.FOCUS)) {
+            ttsManager?.speak("Focus session complete. Great work. Take a short break.")
+        }
         // Give the voice a moment before shutting down.
         scope.launch {
             delay(4_000L)
@@ -232,36 +249,95 @@ class FocusOverlayService : Service() {
 
     private fun showOverlay() {
         if (overlayView != null || !canDrawOverlay()) return
+        val banner = FocusSettings.style(this) == FocusSettings.STYLE_BANNER
+        val strict = FocusSettings.strict(this)
+        val snoozeMin = FocusSettings.snoozeMin(this)
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
+            if (banner) WindowManager.LayoutParams.WRAP_CONTENT else WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                (if (banner) WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE else 0),
             PixelFormat.TRANSLUCENT
-        ).apply { gravity = Gravity.CENTER }
+        ).apply { gravity = if (banner) Gravity.TOP else Gravity.CENTER }
 
-        val view = LayoutInflater.from(this).inflate(R.layout.layout_screen_blocker_overlay, null)
+        val themed = ContextThemeWrapper(this, R.style.Theme_FocusTaskCompanion)
+        val layout = if (banner) R.layout.layout_banner_overlay else R.layout.layout_screen_blocker_overlay
+        val view = LayoutInflater.from(themed).inflate(layout, null)
+
+        val alpha = (FocusSettings.opacityPct(this) * 255 / 100).coerceIn(0, 255)
+        view.findViewById<View>(R.id.overlay_root).background.mutate().alpha = alpha
+        view.findViewById<TextView>(R.id.tv_overlay_message).text = FocusSettings.message(this)
         view.findViewById<TextView>(R.id.tv_overlay_task_name).text = activeTaskName
-        view.findViewById<Button>(R.id.btn_dismiss_overlay).setOnClickListener {
+
+        view.findViewById<Button>(R.id.btn_back_to_task).setOnClickListener {
             lastDismissedTimeMs = System.currentTimeMillis()
             hideOverlay()
+            goBackToTask()
         }
-        view.findViewById<Button>(R.id.btn_end_focus).setOnClickListener {
-            FocusSession.prefs(this).edit()
-                .putBoolean(FocusSession.KEY_ACTIVE, false)
-                .remove(FocusSession.KEY_PAUSED_REMAINING)
-                .apply()
-            stopSelf()
+        view.findViewById<Button>(R.id.btn_snooze_overlay).apply {
+            visibility = if (strict || snoozeMin == 0) View.GONE else View.VISIBLE
+            text = "Snooze $snoozeMin min"
+            setOnClickListener {
+                snoozedUntilMs = System.currentTimeMillis() + snoozeMin * 60_000L
+                hideOverlay()
+            }
+        }
+        view.findViewById<Button>(R.id.btn_end_focus).apply {
+            visibility = if (strict) View.GONE else View.VISIBLE
+            setOnClickListener {
+                FocusSession.prefs(this@FocusOverlayService).edit()
+                    .putBoolean(FocusSession.KEY_ACTIVE, false)
+                    .remove(FocusSession.KEY_PAUSED_REMAINING)
+                    .apply()
+                stopSelf()
+            }
         }
 
         try {
             windowManager?.addView(view, params)
             overlayView = view
-            ttsManager?.speak("You opened an app that isn't on your list. Back to: $activeTaskName")
+            updateOverlayTimeLeft()
+            if (FocusSettings.vibrate(this)) buzz()
+            if (VoiceSettings.isEnabled(this, VoiceSettings.Section.FOCUS)) {
+                ttsManager?.speak("${FocusSettings.message(this)} Back to: $activeTaskName")
+            }
         } catch (e: Exception) {
             Log.w(TAG, "Could not show overlay", e) // e.g. overlay permission revoked
+        }
+    }
+
+    private fun updateOverlayTimeLeft() {
+        val view = overlayView ?: return
+        val left = (endAtMs - System.currentTimeMillis()).coerceAtLeast(0L)
+        view.findViewById<TextView>(R.id.tv_overlay_time_left)?.text = "${formatClock(left)} left in this session"
+    }
+
+    /** Leaves the distracting app: goes to the home screen or opens FocusTask. */
+    private fun goBackToTask() {
+        val intent = if (FocusSettings.backAction(this) == FocusSettings.BACK_APP) {
+            Intent(this, MainActivity::class.java)
+        } else {
+            Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)
+        }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not leave the app", e)
+        }
+    }
+
+    private fun buzz() {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            getSystemService(VibratorManager::class.java)?.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        }
+        if (vibrator?.hasVibrator() == true) {
+            vibrator.vibrate(VibrationEffect.createOneShot(250L, VibrationEffect.DEFAULT_AMPLITUDE))
         }
     }
 
@@ -293,7 +369,6 @@ class FocusOverlayService : Service() {
         const val EXTRA_REMAINING_MS = "extra_remaining_ms"
         private const val ACTION_STOP = "com.focustask.companion.ACTION_STOP_FOCUS"
         private const val DEFAULT_TASK = "Focus session"
-        private const val DEFAULT_REPOPUP_MS = 15_000L
         private const val CHECK_INTERVAL_MS = 1_000L
 
         fun start(context: Context, taskName: String, remainingMs: Long) {

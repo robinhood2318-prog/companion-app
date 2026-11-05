@@ -76,9 +76,24 @@
             android:exported="false"
             android:parentActivityName=".ui.MainActivity" />
 
+        <activity
+            android:name=".ui.SubScreenActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <activity
+            android:name=".ui.focus.FocusSettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity"
+            android:windowSoftInputMode="adjustResize" />
+
         <!-- Only reachable through this app's own PendingIntents -->
         <receiver
             android:name=".meals.MealReminderReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".deadline.DeadlineReceiver"
             android:exported="false" />
 
         <receiver

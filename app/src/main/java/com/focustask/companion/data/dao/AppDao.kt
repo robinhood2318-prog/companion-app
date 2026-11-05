@@ -9,6 +9,12 @@ interface TaskDao {
     @Query("SELECT * FROM tasks ORDER BY isCompleted ASC, createdAt DESC")
     fun getAllTasks(): Flow<List<TaskEntity>>
 
+    @Query("SELECT * FROM tasks WHERE id = :id LIMIT 1")
+    suspend fun getTaskById(id: Long): TaskEntity?
+
+    @Query("SELECT * FROM tasks WHERE isCompleted = 0 AND dueDateTime IS NOT NULL")
+    suspend fun getOpenDeadlinesSync(): List<TaskEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: TaskEntity): Long
 

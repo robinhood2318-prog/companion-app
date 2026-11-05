@@ -19,10 +19,10 @@ import com.focustask.companion.alarm.AlarmScheduler
 import com.focustask.companion.databinding.ActivityMainBinding
 import com.focustask.companion.service.StepTrackerService
 import com.focustask.companion.ui.alarm.AlarmsFragment
-import com.focustask.companion.ui.fitness.FitnessFragment
+import com.focustask.companion.ui.calendar.CalendarFragment
 import com.focustask.companion.ui.focus.FocusFragment
 import com.focustask.companion.ui.home.HomeFragment
-import com.focustask.companion.ui.meals.MealsFragment
+import com.focustask.companion.ui.more.MoreFragment
 import com.focustask.companion.util.canDrawOverlay
 import com.focustask.companion.util.canPostNotifications
 import com.focustask.companion.util.canUseFullScreenAlarms
@@ -204,9 +204,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun createFragment(itemId: Int): Fragment = when (itemId) {
         R.id.nav_focus -> FocusFragment()
+        R.id.nav_calendar -> CalendarFragment()
         R.id.nav_alarm -> AlarmsFragment()
-        R.id.nav_fitness -> FitnessFragment()
-        R.id.nav_menu -> MealsFragment()
+        R.id.nav_more -> MoreFragment()
         else -> HomeFragment()
     }
 
@@ -340,9 +340,9 @@ class MainActivity : AppCompatActivity() {
         private val TABS = listOf(
             R.id.nav_home to TAG_HOME,
             R.id.nav_focus to "tab_focus",
+            R.id.nav_calendar to "tab_calendar",
             R.id.nav_alarm to "tab_alarm",
-            R.id.nav_fitness to "tab_fitness",
-            R.id.nav_menu to "tab_menu"
+            R.id.nav_more to "tab_more"
         )
     }
 }

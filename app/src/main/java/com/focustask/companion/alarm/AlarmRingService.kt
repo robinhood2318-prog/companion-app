@@ -25,6 +25,7 @@ import com.focustask.companion.FocusTaskApp
 import com.focustask.companion.data.model.AlarmEntity
 import com.focustask.companion.tts.TtsManager
 import com.focustask.companion.ui.AlarmAlertActivity
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.util.notifyIfAllowed
 import com.focustask.companion.util.startForegroundCompat
 
@@ -49,7 +50,8 @@ class AlarmRingService : Service() {
         val alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1L)
         val label = intent.getStringExtra(EXTRA_LABEL) ?: "Alarm"
         val customUri = intent.getStringExtra(EXTRA_CUSTOM_URI)
-        val callout = intent.getBooleanExtra(EXTRA_CALLOUT, true)
+        val callout = intent.getBooleanExtra(EXTRA_CALLOUT, true) &&
+            VoiceSettings.isEnabled(this, VoiceSettings.Section.ALARMS)
 
         val launchedByScreen = intent.getBooleanExtra(EXTRA_LAUNCHED_BY_SCREEN, false)
         val screenIntent = alertIntent(this, intent).putExtra(EXTRA_FROM_SERVICE, true)

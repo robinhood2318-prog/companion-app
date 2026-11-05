@@ -20,7 +20,9 @@ import com.focustask.companion.meals.MealScheduler
 import com.focustask.companion.service.AmbientAudioService
 import com.focustask.companion.service.FocusSession
 import com.focustask.companion.service.StepTrackerService
+import com.focustask.companion.deadline.Deadlines
 import com.focustask.companion.ui.MainActivity
+import com.focustask.companion.ui.SubScreenActivity
 import com.focustask.companion.ui.focusOrder
 import com.focustask.companion.ui.nextAlarm
 import com.focustask.companion.ui.sounds.SoundsActivity
@@ -56,8 +58,13 @@ class HomeFragment : Fragment() {
         binding.btnSetup.setOnClickListener { main.startSetupGuide() }
         binding.cardFocus.setOnClickListener { main.selectTab(R.id.nav_focus) }
         binding.cardNextAlarm.setOnClickListener { main.selectTab(R.id.nav_alarm) }
-        binding.cardSteps.setOnClickListener { main.selectTab(R.id.nav_fitness) }
-        binding.cardDinner.setOnClickListener { main.selectTab(R.id.nav_menu) }
+        binding.cardSteps.setOnClickListener {
+            SubScreenActivity.open(requireContext(), SubScreenActivity.SCREEN_FITNESS)
+        }
+        binding.cardDinner.setOnClickListener {
+            SubScreenActivity.open(requireContext(), SubScreenActivity.SCREEN_MEALS)
+        }
+        binding.tvNextDeadline.setOnClickListener { main.selectTab(R.id.nav_calendar) }
         binding.cardSounds.setOnClickListener { startActivity(Intent(requireContext(), SoundsActivity::class.java)) }
 
         binding.cbTopTask.setOnCheckedChangeListener { button, checked ->
@@ -79,6 +86,11 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     db.taskDao().getAllTasks().collect { tasks ->
+                        val next = tasks.filter { !it.isCompleted && it.dueDateTime != null }
+                            .minByOrNull { it.dueDateTime!! }
+                        binding.tvNextDeadline.text = next?.let {
+                            "Next deadline: ${it.title} · ${Deadlines.countdown(it.dueDateTime!!)}"
+                        } ?: "No deadlines: add one on the Calendar tab"
                         topTask = tasks.focusOrder().firstOrNull { !it.isCompleted }
                         val t = topTask
                         binding.cbTopTask.isChecked = false

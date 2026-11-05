@@ -8,6 +8,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.focustask.companion.FocusTaskApp
 import com.focustask.companion.ui.MainActivity
+import com.focustask.companion.util.QuickSpeaker
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.util.notifyIfAllowed
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,7 @@ class MealReminderReceiver : BroadcastReceiver() {
         val appContext = context.applicationContext
         val pending = goAsync()
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            var speaking = false
             try {
                 val meal = (appContext as FocusTaskApp).database.mealDao().getMealById(mealId) ?: return@launch
                 MealScheduler.schedule(appContext, meal) // same time next week
@@ -46,10 +49,18 @@ class MealReminderReceiver : BroadcastReceiver() {
                     .setAutoCancel(true)
                     .build()
                 appContext.notifyIfAllowed(NOTIFICATION_BASE + mealId.toInt(), notification)
+
+                if (VoiceSettings.isEnabled(appContext, VoiceSettings.Section.MEALS)) {
+                    speaking = true
+                    QuickSpeaker.speak(
+                        appContext,
+                        "Time to cook ${MealScheduler.mealLabel(meal.mealType).lowercase()}: ${meal.dishName}."
+                    ) { pending.finish() }
+                }
             } catch (e: Exception) {
                 Log.e("MealReminderReceiver", "Meal reminder failed", e)
             } finally {
-                pending.finish()
+                if (!speaking) pending.finish()
             }
         }
     }

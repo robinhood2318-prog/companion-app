@@ -28,6 +28,7 @@ import com.focustask.companion.data.model.AlarmEntity
 import com.focustask.companion.databinding.DialogAlarmDetailsBinding
 import com.focustask.companion.databinding.FragmentAlarmsBinding
 import com.focustask.companion.ui.dp
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.ui.formatTime
 import com.focustask.companion.ui.nextAlarm
 import com.focustask.companion.ui.repeatLabel
@@ -80,6 +81,7 @@ class AlarmsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.fabAddAlarm.setOnClickListener { addAlarm() }
+        VoiceSettings.bindToggle(binding.btnVoice, VoiceSettings.Section.ALARMS)
         binding.switchHero.setOnCheckedChangeListener { button, enabled ->
             val alarm = heroAlarm ?: return@setOnCheckedChangeListener
             if (button.isPressed) setAlarmEnabled(alarm, enabled)

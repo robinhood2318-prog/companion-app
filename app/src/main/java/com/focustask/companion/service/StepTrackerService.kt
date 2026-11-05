@@ -16,6 +16,8 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.focustask.companion.FocusTaskApp
 import com.focustask.companion.data.model.DailyStepEntity
+import com.focustask.companion.tts.TtsManager
+import com.focustask.companion.util.VoiceSettings
 import com.focustask.companion.util.hasActivityRecognition
 import com.focustask.companion.util.notifyIfAllowed
 import com.focustask.companion.util.startForegroundCompat
@@ -45,6 +47,7 @@ class StepTrackerService : Service(), SensorEventListener {
     private var stepsToday = 0L
     private var lastRaw = -1L
     private var lastFlushMs = 0L
+    private var tts: TtsManager? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -91,10 +94,33 @@ class StepTrackerService : Service(), SensorEventListener {
         stepsToday += delta
         prefs.edit().putLong(KEY_LAST_RAW, lastRaw).putLong(KEY_STEPS, stepsToday).apply()
 
+        announceGoalIfReached()
+
         val now = System.currentTimeMillis()
         if (now - lastFlushMs >= FLUSH_INTERVAL_MS) {
             lastFlushMs = now
             flush()
+        }
+    }
+
+    /** Once a day, when today's steps reach the goal: notification, plus voice if enabled. */
+    private fun announceGoalIfReached() {
+        val goal = goal(this)
+        if (stepsToday < goal || prefs.getString(KEY_GOAL_ANNOUNCED, "") == dateKey) return
+        prefs.edit().putString(KEY_GOAL_ANNOUNCED, dateKey).apply()
+        val message = "Goal reached! You walked $goal steps today."
+        notifyIfAllowed(
+            GOAL_NOTIFICATION_ID,
+            NotificationCompat.Builder(this, FocusTaskApp.CHANNEL_REMINDER_ID)
+                .setSmallIcon(android.R.drawable.star_on)
+                .setContentTitle("Step goal reached")
+                .setContentText(message)
+                .setAutoCancel(true)
+                .build()
+        )
+        if (VoiceSettings.isEnabled(this, VoiceSettings.Section.FITNESS)) {
+            if (tts == null) tts = TtsManager(this)
+            tts?.speak("Well done. $message")
         }
     }
 
@@ -143,6 +169,7 @@ class StepTrackerService : Service(), SensorEventListener {
             CoroutineScope(Dispatchers.IO).launch { dao.insertOrUpdate(record) }
         }
         scope.cancel()
+        tts?.release()
         super.onDestroy()
     }
 
@@ -155,6 +182,8 @@ class StepTrackerService : Service(), SensorEventListener {
         private const val KEY_DATE = "date"
         private const val KEY_STEPS = "steps_today"
         private const val KEY_LAST_RAW = "last_raw"
+        private const val KEY_GOAL_ANNOUNCED = "goal_announced_date"
+        private const val GOAL_NOTIFICATION_ID = 4006
         private const val FLUSH_INTERVAL_MS = 10_000L
         private const val STRIDE_METERS = 0.75f
         private const val KCAL_PER_STEP = 0.045f

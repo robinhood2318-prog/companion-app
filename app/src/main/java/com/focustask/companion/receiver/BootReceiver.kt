@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.focustask.companion.FocusTaskApp
 import com.focustask.companion.alarm.AlarmScheduler
+import com.focustask.companion.deadline.DeadlineScheduler
 import com.focustask.companion.meals.MealScheduler
 import com.focustask.companion.service.StepTrackerService
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +32,7 @@ class BootReceiver : BroadcastReceiver() {
                 val db = (appContext as FocusTaskApp).database
                 dao.getActiveAlarmsSync().forEach { AlarmScheduler.schedule(appContext, it) }
                 db.mealDao().getAllMealsSync().forEach { MealScheduler.schedule(appContext, it) }
+                db.taskDao().getOpenDeadlinesSync().forEach { DeadlineScheduler.schedule(appContext, it) }
             } catch (e: Exception) {
                 Log.e("BootReceiver", "Failed to reschedule alarms", e)
             } finally {

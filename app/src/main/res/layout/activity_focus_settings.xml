@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settings_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/header_start"
+    android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_header"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="20dp">
+
+                <ImageButton
+                    android:id="@+id/btn_back"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Back"
+                    android:src="@drawable/ic_back"
+                    app:tint="@color/text_on_header" />
+
+                <TextView
+                    style="@style/HeaderTitle"
+                    android:layout_marginStart="4dp"
+                    android:text="Screen Reminder Settings" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Style -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:text="Reminder style" />
+
+                        <TextView
+                            style="@style/CardLabel"
+                            android:text="Full screen covers the app. Banner is a smaller card at the top." />
+
+                        <com.google.android.material.button.MaterialButtonToggleGroup
+                            android:id="@+id/toggle_style"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            app:selectionRequired="true"
+                            app:singleSelection="true">
+
+                            <Button
+                                android:id="@+id/btn_style_full"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Full screen" />
+
+                            <Button
+                                android:id="@+id/btn_style_banner"
+                                style="@style/Widget.Material3.Button.OutlinedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Banner" />
+                        </com.google.android.material.button.MaterialButtonToggleGroup>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Timing -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:text="Pop-up frequency" />
+
+                        <TextView
+                            android:id="@+id/tv_repopup_value"
+                            style="@style/CardLabel" />
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/slider_repopup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="Pop-up frequency"
+                            android:stepSize="1"
+                            android:valueFrom="0"
+                            android:valueTo="7"
+                            app:labelBehavior="gone" />
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:layout_marginTop="8dp"
+                            android:text="Grace period" />
+
+                        <TextView
+                            android:id="@+id/tv_grace_value"
+                            style="@style/CardLabel" />
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/slider_grace"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="Grace period"
+                            android:stepSize="1"
+                            android:valueFrom="0"
+                            android:valueTo="5"
+                            app:labelBehavior="gone" />
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:layout_marginTop="8dp"
+                            android:text="Snooze button" />
+
+                        <TextView
+                            android:id="@+id/tv_snooze_value"
+                            style="@style/CardLabel" />
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/slider_snooze"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="Snooze length"
+                            android:stepSize="1"
+                            android:valueFrom="0"
+                            android:valueTo="5"
+                            app:labelBehavior="gone" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Look -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:text="Reminder message" />
+
+                        <EditText
+                            android:id="@+id/et_message"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:importantForAutofill="no"
+                            android:inputType="textCapSentences"
+                            android:maxLength="80" />
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:layout_marginTop="8dp"
+                            android:text="Background opacity" />
+
+                        <TextView
+                            android:id="@+id/tv_opacity_value"
+                            style="@style/CardLabel" />
+
+                        <com.google.android.material.slider.Slider
+                            android:id="@+id/slider_opacity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:contentDescription="Background opacity"
+                            android:stepSize="5"
+                            android:valueFrom="50"
+                            android:valueTo="100"
+                            app:labelBehavior="gone" />
+
+                        <TextView
+                            style="@style/SettingTitle"
+                            android:layout_marginTop="8dp"
+                            android:text="&quot;Back to task&quot; button opens" />
+
+                        <RadioGroup
+                            android:id="@+id/rg_back_action"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RadioButton
+                                android:id="@+id/rb_back_home"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Home screen" />
+
+                            <RadioButton
+                                android:id="@+id/rb_back_app"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="FocusTask (your timer and tasks)" />
+                        </RadioGroup>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Switches -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switch_strict"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Strict mode (hide Snooze and End buttons)" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switch_vibrate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Vibrate when the reminder appears" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switch_voice"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Read the reminder aloud" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    style="@style/CardLabel"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="24dp"
+                    android:text="Changes apply right away, even during a running session. Phone, emergency, Settings and your home screen are never covered." />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

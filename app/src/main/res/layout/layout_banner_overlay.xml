@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Compact focus reminder shown at the top of the screen. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:id="@+id/overlay_root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#3730A3"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_overlay_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_overlay_task_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="#FDE047"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_overlay_time_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#C7D2FE"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_end_focus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:backgroundTint="#5B54E8"
+                android:text="End"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btn_snooze_overlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
+                android:backgroundTint="#5B54E8"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/btn_back_to_task"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#F59E0B"
+                android:text="Back to task"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

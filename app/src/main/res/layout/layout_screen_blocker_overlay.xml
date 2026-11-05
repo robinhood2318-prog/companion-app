@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Full-screen focus reminder. Background opacity is set in code from the user's settings. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/overlay_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="#3730A3"
     android:gravity="center"
-    android:background="#F0450A0A"
-    android:padding="24dp">
+    android:orientation="vertical"
+    android:padding="28dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="FOCUS SHIELD ACTIVE"
-        android:textColor="#FECACA"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+    <ImageView
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_launcher_foreground" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Get Back to Your Task!"
+        android:text="FOCUS SHIELD ACTIVE"
+        android:textColor="#C7D2FE"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_overlay_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
         android:textColor="#FFFFFF"
         android:textSize="26sp"
         android:textStyle="bold" />
@@ -29,22 +39,41 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Assigned Task"
+        android:gravity="center"
         android:textColor="#FDE047"
         android:textSize="18sp" />
 
+    <TextView
+        android:id="@+id/tv_overlay_time_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="#C7D2FE"
+        android:textSize="14sp" />
+
     <Button
-        android:id="@+id/btn_dismiss_overlay"
+        android:id="@+id/btn_back_to_task"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="Back to Task (Dismiss)" />
+        android:backgroundTint="#F59E0B"
+        android:text="Back to my task"
+        android:textColor="#FFFFFF" />
+
+    <Button
+        android:id="@+id/btn_snooze_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#5B54E8"
+        android:textColor="#FFFFFF" />
 
     <Button
         android:id="@+id/btn_end_focus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="End Focus Session" />
-
+        android:backgroundTint="#5B54E8"
+        android:text="End focus session"
+        android:textColor="#FFFFFF" />
 </LinearLayout>
