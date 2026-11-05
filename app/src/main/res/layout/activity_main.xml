@@ -4,163 +4,24 @@
     android:id="@+id/main_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/header_start"
     android:orientation="vertical">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/top_app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary"
-        app:title="@string/app_name"
-        app:titleTextColor="@android:color/white" />
-
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="@color/background" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Setup -->
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Setup" />
-
-            <TextView
-                android:id="@+id/tv_setup_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary" />
-
-            <Button
-                android:id="@+id/btn_grant_next"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
-
-            <!-- Focus -->
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Study focus" />
-
-            <EditText
-                android:id="@+id/et_task_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="What are you working on?"
-                android:importantForAutofill="no"
-                android:inputType="textCapSentences"
-                android:maxLength="80" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_start_focus"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/start_study_session" />
-
-                <Button
-                    android:id="@+id/btn_stop_focus"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/end_study_session" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_allowed_apps"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Choose allowed apps" />
-
-            <TextView
-                android:id="@+id/tv_allowed_summary"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-
-            <!-- Alarms -->
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Alarms" />
-
-            <LinearLayout
-                android:id="@+id/alarm_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
-
-            <Button
-                android:id="@+id/btn_add_alarm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add alarm" />
-
-            <!-- Ambient sound -->
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Ambient sound" />
-
-            <com.google.android.material.chip.ChipGroup
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_brown"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Ocean rumble" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_pink"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Gentle rain" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_white"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="White noise" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_custom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="My audio file…" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_stop_audio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Stop" />
-            </com.google.android.material.chip.ChipGroup>
-
-            <!-- Steps -->
-            <TextView
-                style="@style/SectionTitle"
-                android:text="Steps today" />
-
-            <TextView
-                android:id="@+id/tv_steps"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_primary"
-                android:textSize="16sp" />
-        </LinearLayout>
-    </ScrollView>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        app:itemActiveIndicatorStyle="@style/Widget.Material3.BottomNavigationView.ActiveIndicator"
+        app:itemIconTint="@color/bottom_nav_item"
+        app:itemTextColor="@color/bottom_nav_item"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav" />
 </LinearLayout>

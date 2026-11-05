@@ -5,16 +5,21 @@ import android.media.AudioFormat
 import android.media.AudioTrack
 import android.util.Log
 import java.util.Random
+import kotlin.math.PI
+import kotlin.math.sin
 
 /**
- * Generates soothing noise on the fly (no audio files needed):
- *  - "brown": deep, ocean-like rumble
- *  - "pink":  soft, rain-like hiss
- *  - "white": flat hiss
+ * Generates ambient soundscapes on the fly (no audio files needed):
+ *  - "waves":  beach waves (brown noise with a slow swell)
+ *  - "forest": soft wind with bird chirps
+ *  - "pink":   gentle rain
+ *  - "white":  white noise
+ *  - "brown":  deep rumble
  */
-class NoisePlayer(private val type: String) {
+class NoisePlayer(private val type: String, initialVolume: Float) {
 
     @Volatile private var running = false
+    @Volatile var volume: Float = initialVolume.coerceIn(0f, 1f)
     private var thread: Thread? = null
 
     fun start() {
@@ -63,15 +68,53 @@ class NoisePlayer(private val type: String) {
         var b0 = 0.0
         var b1 = 0.0
         var b2 = 0.0
+        var sampleIndex = 0L
+
+        // Bird chirp state
+        var chirpLeft = 0
+        var chirpLen = 1
+        var chirpPhase = 0.0
+        var chirpF0 = 3000.0
+        var chirpF1 = 4000.0
+        var followUps = 0
+
         try {
             track.play()
             while (running) {
                 for (i in buffer.indices) {
                     val white = random.nextDouble() * 2.0 - 1.0
+                    val t = sampleIndex.toDouble() / SAMPLE_RATE
                     val sample = when (type) {
-                        "brown" -> {
+                        "waves" -> {
                             brown = (brown + 0.02 * white) / 1.02
-                            brown * 3.5
+                            // Slow swell every ~8 s, like waves rolling in
+                            val swell = 0.25 + 0.75 * (0.5 + 0.5 * sin(2 * PI * t / 8.0)).let { it * it }
+                            brown * 3.5 * swell
+                        }
+                        "forest" -> {
+                            b0 = 0.99765 * b0 + white * 0.0990460
+                            b1 = 0.96300 * b1 + white * 0.2965164
+                            b2 = 0.57000 * b2 + white * 1.0526913
+                            var s = (b0 + b1 + b2 + white * 0.1848) * 0.03 // soft wind
+                            if (chirpLeft <= 0) {
+                                val startChirp = if (followUps > 0) random.nextDouble() < 12.0 / SAMPLE_RATE
+                                else random.nextDouble() < 0.6 / SAMPLE_RATE
+                                if (startChirp) {
+                                    if (followUps > 0) followUps-- else followUps = random.nextInt(4)
+                                    chirpLen = (SAMPLE_RATE * (0.05 + random.nextDouble() * 0.1)).toInt()
+                                    chirpLeft = chirpLen
+                                    chirpF0 = 2500.0 + random.nextDouble() * 2000.0
+                                    chirpF1 = chirpF0 + (random.nextDouble() - 0.3) * 2500.0
+                                }
+                            }
+                            if (chirpLeft > 0) {
+                                val progress = 1.0 - chirpLeft.toDouble() / chirpLen
+                                val freq = chirpF0 + (chirpF1 - chirpF0) * progress
+                                chirpPhase += 2 * PI * freq / SAMPLE_RATE
+                                s += 0.35 * sin(chirpPhase) * sin(PI * progress)
+                                chirpLeft--
+                            }
+                            s
                         }
                         "pink" -> { // Paul Kellet's economy pink-noise filter
                             b0 = 0.99765 * b0 + white * 0.0990460
@@ -79,9 +122,14 @@ class NoisePlayer(private val type: String) {
                             b2 = 0.57000 * b2 + white * 1.0526913
                             (b0 + b1 + b2 + white * 0.1848) * 0.11
                         }
+                        "brown" -> {
+                            brown = (brown + 0.02 * white) / 1.02
+                            brown * 3.5
+                        }
                         else -> white * 0.5
                     }
-                    buffer[i] = (sample.coerceIn(-1.0, 1.0) * VOLUME * Short.MAX_VALUE).toInt().toShort()
+                    sampleIndex++
+                    buffer[i] = (sample.coerceIn(-1.0, 1.0) * MAX_GAIN * volume * Short.MAX_VALUE).toInt().toShort()
                 }
                 track.write(buffer, 0, buffer.size)
             }
@@ -93,6 +141,6 @@ class NoisePlayer(private val type: String) {
 
     companion object {
         private const val SAMPLE_RATE = 22_050
-        private const val VOLUME = 0.35
+        private const val MAX_GAIN = 0.6
     }
 }

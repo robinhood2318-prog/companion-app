@@ -159,6 +159,24 @@ class StepTrackerService : Service(), SensorEventListener {
         private const val STRIDE_METERS = 0.75f
         private const val KCAL_PER_STEP = 0.045f
 
+        private const val KEY_GOAL = "daily_goal"
+        const val DEFAULT_GOAL = 10_000
+        const val STRIDE_KM = STRIDE_METERS / 1000f
+
+        fun goal(context: Context): Int =
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_GOAL, DEFAULT_GOAL)
+
+        fun setGoal(context: Context, steps: Int) {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+                .putInt(KEY_GOAL, steps.coerceIn(1_000, 50_000)).apply()
+        }
+
+        /** "yyyy-MM-dd" key for a day [daysAgo] days before today. */
+        fun dayKey(daysAgo: Int): String {
+            val cal = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, -daysAgo) }
+            return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(cal.time)
+        }
+
         fun todayKey(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
         /** Starts tracking only if the permission and the sensor are available. */

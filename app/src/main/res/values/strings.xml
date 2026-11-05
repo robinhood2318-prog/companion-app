@@ -5,4 +5,8 @@
     <string name="add_task">Add Task</string>
     <string name="dismiss_alarm">Dismiss</string>
     <string name="snooze_alarm">Snooze</string>
+    <string name="today_primary_focus">Today\'s Primary Focus</string>
+    <string name="todays_dinner">Today\'s Dinner</string>
+    <string name="this_weeks_dinners">This week\'s dinners</string>
+    <string name="skips_todays_dinner">Skips today\'s dinner cooking reminder</string>
 </resources>

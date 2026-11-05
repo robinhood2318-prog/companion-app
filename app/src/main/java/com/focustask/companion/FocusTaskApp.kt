@@ -57,8 +57,16 @@ class FocusTaskApp : Application() {
             description = "Background pedometer step logging"
         }
 
+        val reminderChannel = NotificationChannel(
+            CHANNEL_REMINDER_ID,
+            "Cooking reminders",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Weekly menu reminders to start cooking"
+        }
+
         notificationManager.createNotificationChannels(
-            listOf(alarmChannel, focusChannel, audioChannel, fitChannel)
+            listOf(alarmChannel, focusChannel, audioChannel, fitChannel, reminderChannel)
         )
     }
 
@@ -68,5 +76,6 @@ class FocusTaskApp : Application() {
         const val CHANNEL_FOCUS_ID = "channel_focus_guardian"
         const val CHANNEL_AUDIO_ID = "channel_ambient_audio"
         const val CHANNEL_FIT_ID = "channel_fit_pedometer"
+        const val CHANNEL_REMINDER_ID = "channel_meal_reminders"
     }
 }

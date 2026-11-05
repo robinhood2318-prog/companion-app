@@ -2,8 +2,24 @@
     <color name="primary">#4338CA</color>
     <color name="primary_variant">#3730A3</color>
     <color name="secondary">#059669</color>
-    <color name="background">#F8FAFC</color>
+    <color name="header_start">#3730A3</color>
+    <color name="header_end">#4F46E5</color>
+    <color name="header_card">#5B54E8</color>
+    <color name="background">#F4F5FB</color>
     <color name="surface">#FFFFFF</color>
     <color name="text_primary">#1E293B</color>
     <color name="text_secondary">#64748B</color>
+    <color name="text_on_header">#FFFFFF</color>
+    <color name="text_on_header_muted">#C7D2FE</color>
+    <color name="ring_track">#E5E7EB</color>
+    <color name="ring_track_dark">#6D67EC</color>
+    <color name="accent_green">#10B981</color>
+    <color name="accent_orange">#F59E0B</color>
+    <color name="accent_red">#EF4444</color>
+    <color name="card_lavender">#EEF0FB</color>
+    <color name="card_mint">#E3F5EC</color>
+    <color name="card_peach">#FFF0E0</color>
+    <color name="card_sky">#E6F2FB</color>
+    <color name="card_rose">#FDE8EC</color>
+    <color name="card_lemon">#FEF9C3</color>
 </resources>

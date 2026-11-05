@@ -51,6 +51,18 @@ interface MealDao {
     @Query("SELECT * FROM weekly_meals")
     suspend fun getAllMealsSync(): List<MealEntity>
 
+    @Query("SELECT * FROM weekly_meals")
+    fun getAllMeals(): Flow<List<MealEntity>>
+
+    @Query("SELECT * FROM weekly_meals WHERE id = :id LIMIT 1")
+    suspend fun getMealById(id: Long): MealEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMeal(meal: MealEntity): Long
+
+    @Delete
+    suspend fun deleteMeal(meal: MealEntity)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdateMeals(meals: List<MealEntity>)
 
@@ -62,6 +74,9 @@ interface MealDao {
 interface StepDao {
     @Query("SELECT * FROM daily_steps WHERE dateString = :date LIMIT 1")
     fun getStepsForDate(date: String): Flow<DailyStepEntity?>
+
+    @Query("SELECT * FROM daily_steps WHERE dateString >= :fromDate ORDER BY dateString ASC")
+    fun getStepsSince(fromDate: String): Flow<List<DailyStepEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrUpdate(stepRecord: DailyStepEntity)

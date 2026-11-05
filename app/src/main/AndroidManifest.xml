@@ -71,7 +71,16 @@
             android:taskAffinity=""
             android:turnScreenOn="true" />
 
+        <activity
+            android:name=".ui.sounds.SoundsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.MainActivity" />
+
         <!-- Only reachable through this app's own PendingIntents -->
+        <receiver
+            android:name=".meals.MealReminderReceiver"
+            android:exported="false" />
+
         <receiver
             android:name=".receiver.AlarmReceiver"
             android:exported="false" />
