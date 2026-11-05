@@ -63,6 +63,12 @@ class MoreFragment : Fragment() {
         )
         entries.forEach { binding.moreList.addView(entryCard(it)) }
         renderVoiceSwitches()
+        val version = try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        } catch (_: Exception) {
+            null
+        }
+        binding.tvVersion.text = "FocusTask Companion ${version ?: ""}"
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

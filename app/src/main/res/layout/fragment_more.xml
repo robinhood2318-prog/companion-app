@@ -51,6 +51,12 @@
             android:orientation="vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:paddingBottom="24dp" />
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tv_version"
+            style="@style/CardLabel"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

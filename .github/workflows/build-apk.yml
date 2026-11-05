@@ -40,8 +40,34 @@ jobs:
           fi
           chmod +x gradlew
 
+      # Every build must be signed with the same key, otherwise Android refuses to
+      # install it as an update over an earlier beta. The key lives in a repository secret.
+      - name: Use the fixed test signing key
+        env:
+          DEBUG_KEYSTORE_BASE64: ${{ secrets.DEBUG_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$DEBUG_KEYSTORE_BASE64" ]; then
+            mkdir -p ~/.android
+            echo "$DEBUG_KEYSTORE_BASE64" | base64 -d > ~/.android/debug.keystore
+            echo "Using the fixed test signing key."
+          else
+            echo "::warning::DEBUG_KEYSTORE_BASE64 secret is not set. This APK is signed with a random key and will NOT install over earlier builds."
+          fi
+
+      - name: Read app version
+        run: |
+          VERSION=$(grep -m1 'versionName' app/build.gradle.kts | sed 's/.*"\(.*\)".*/\1/')
+          BRANCH=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
+          echo "APP_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "ARTIFACT_NAME=FocusTask-$VERSION-$BRANCH-debug" >> "$GITHUB_ENV"
+
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
+
+      - name: Name the APK after its version
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/*.apk "dist/FocusTask-${APP_VERSION}-debug.apk"
 
       - name: Run Android Lint
         run: ./gradlew lintDebug
@@ -50,9 +76,9 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: FocusTaskCompanion-Debug-APK
-          path: app/build/outputs/apk/debug/*.apk
-          retention-days: 14
+          name: ${{ env.ARTIFACT_NAME }}
+          path: dist/*.apk
+          retention-days: 30
 
       - name: Upload lint report
         if: always()
